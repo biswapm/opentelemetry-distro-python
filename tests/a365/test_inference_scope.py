@@ -70,6 +70,27 @@ def test_inference_scope_records_model_observation_attributes() -> None:
         scope.dispose()
 
 
+def test_inference_scope_records_canonical_operation_names() -> None:
+    for operation_name, expected in (
+        (InferenceOperationType.CHAT, "chat"),
+        (InferenceOperationType.TEXT_COMPLETION, "text_completion"),
+        (InferenceOperationType.GENERATE_CONTENT, "generate_content"),
+    ):
+        scope = InferenceScope.start(
+            Request(),
+            InferenceCallDetails(
+                operationName=operation_name,
+                model="gpt-4o",
+                providerName="openai",
+            ),
+            AgentDetails(agent_id="agent-1"),
+        )
+        try:
+            assert _span_attributes(scope)["gen_ai.operation.name"] == expected
+        finally:
+            scope.dispose()
+
+
 def test_inference_scope_records_late_response_details() -> None:
     scope = InferenceScope.start(
         Request(),
