@@ -98,9 +98,10 @@ class InferenceScope(OpenTelemetryScope):
             else SpanDetails(span_kind=SpanKind.CLIENT)
         )
 
+        operation_name = details.operationName.name.lower()
         super().__init__(
-            operation_name=details.operationName.name.lower(),
-            activity_name=f"{details.operationName.value} {details.model}",
+            operation_name=operation_name,
+            activity_name=f"{operation_name} {details.model}",
             agent_details=agent_details,
             span_details=resolved_span_details,
         )
@@ -109,7 +110,7 @@ class InferenceScope(OpenTelemetryScope):
             self.record_input_messages(request.content)
         self.set_tag_maybe(GEN_AI_CONVERSATION_ID_KEY, request.conversation_id)
 
-        self.set_tag_maybe(GEN_AI_OPERATION_NAME_KEY, details.operationName.name.lower())
+        self.set_tag_maybe(GEN_AI_OPERATION_NAME_KEY, operation_name)
         self.set_tag_maybe(GEN_AI_REQUEST_MODEL_KEY, details.model)
         self.set_tag_maybe(GEN_AI_RESPONSE_MODEL_KEY, details.responseModel)
         self.set_tag_maybe(GEN_AI_PROVIDER_NAME_KEY, details.providerName)

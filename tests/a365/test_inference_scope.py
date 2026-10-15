@@ -87,6 +87,8 @@ def test_inference_scope_records_canonical_operation_names() -> None:
         )
         try:
             assert _span_attributes(scope)["gen_ai.operation.name"] == expected
+            assert scope._span is not None
+            assert cast(Any, scope._span).name == f"{expected} gpt-4o"
         finally:
             scope.dispose()
 
